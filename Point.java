@@ -1,7 +1,7 @@
 package com.greedysnakeproject;
 
 public class Point{
-    public static double twoPointDistance(Point pointA, Point pointB) {
+    public static double twoPointsDistance(Point pointA, Point pointB) {
         return Math.sqrt(Math.pow(pointA.getX() - pointB.getX(), 2)
                 + Math.pow(pointA.getY() - pointB.getY(), 2));
     }
@@ -39,15 +39,8 @@ public class Point{
         return x;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
     public double getY() {
         return y;
     }
 
-    public void setY(double y) {
-        this.y = y;
-    }
 }

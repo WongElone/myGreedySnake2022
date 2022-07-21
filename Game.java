@@ -1,6 +1,3 @@
-// FUTURE UPDATES
-// ADD queue of size 2 to store fast typing keys temporarily
-
 package com.greedysnakeproject;
 
 import javax.swing.*;
@@ -31,7 +28,6 @@ public class Game extends Canvas implements Runnable{
     private Snake snake;
     private Item food;
     private ArrayList<Rectangle> obstacles = new ArrayList<>();
-//    private Queue<Integer> queueOfKeyEvents = new LinkedList<>();
 
 
     public static void main (String args[]) {
@@ -43,8 +39,6 @@ public class Game extends Canvas implements Runnable{
 
     @Override
     public void run() {
-//        initSnake();
-//        addKeyListener(new KeyInput(this));
 //        this.requestFocus();
 //        setFocusable(true);
         long lastTime = System.nanoTime();
@@ -66,8 +60,7 @@ public class Game extends Canvas implements Runnable{
                 updates++;
                 delta--;
             }
-//            if (!isGameOver())
-//                render();
+
             frames++;
 
             if (System.currentTimeMillis() - timer >= 1000) {
@@ -120,14 +113,6 @@ public class Game extends Canvas implements Runnable{
         }
         System.exit(1);
     }
-
-//    public void keyTyped(KeyEvent e) {
-//        char key = e.getKeyChar();
-//
-//        if (!isTurnSnakeAllowed()) return;
-//
-//        turnSnake(key);
-//    }
 
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
@@ -187,9 +172,6 @@ public class Game extends Canvas implements Runnable{
         for (int i = 0; i < 1000; i++) { // only try 1000 times
             // generate random rectangle within gameCage
             var gameCage = getGameCage();
-//            double boundaryBuffer = 10;
-//            double randX = gameCage.x + boundaryBuffer + Math.random() * (gameCage.width - boundaryBuffer - foodOccupancyDiameter);
-//            double randY = gameCage.y + boundaryBuffer + Math.random() * (gameCage.height - boundaryBuffer - foodOccupancyDiameter);
             double randX = gameCage.x + Math.random() * (gameCage.width - foodOccupancyDiameter);
             double randY = gameCage.y + Math.random() * (gameCage.height - foodOccupancyDiameter);
             Rectangle randOccupancy = new Rectangle(randX, randY, foodOccupancyDiameter, foodOccupancyDiameter);
@@ -245,17 +227,11 @@ public class Game extends Canvas implements Runnable{
         g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
 
         if (!isGameOver()) {
-//            g.setColor(Color.white);
-//            g.fillOval(300, 300, 100, 50);
             snake.render(g);
             render_Food(g);
             render_Obstacles(g);
         }
-        else {
-            return;
-//            g.setColor(Color.white);
-//            g.fillRect(WIDTH * SCALE / 4, HEIGHT * SCALE / 4, WIDTH * SCALE / 2, HEIGHT * SCALE / 2);
-        }
+        else return;
 
 ////////////////////////////////////////////////////
         g.dispose();
@@ -285,81 +261,46 @@ public class Game extends Canvas implements Runnable{
 
         Point neck = (snake.turningPoints.isEmpty()) ? new Point(snake.getTailX(), snake.getTailY()) : snake.turningPoints.get(0);
 
-        return Point.twoPointDistance(head, neck) > snake.getThickness() + 3 * SCALE;
+        return Point.twoPointsDistance(head, neck) > snake.getThickness() + 3 * SCALE;
+    }
+
+    private boolean turnSnake(int key) {
+        if (!isTurnSnakeAllowed()) return false;
+
+        double velX = snake.getVelHeadX();
+        double velY = snake.getVelHeadY();
+
+        if ((key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT) && velX == 0) {
+            velX = (key == KeyEvent.VK_RIGHT) ? Math.abs(velY) : - Math.abs(velY);
+            velY = 0;
+        }
+        else if ((key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) && velY == 0) {
+            velY = (key == KeyEvent.VK_DOWN) ? Math.abs(velX) : - Math.abs(velX);
+            velX = 0;
+        }
+
+        snake.turningPoints.add(0, new Point(snake.getHeadX(), snake.getHeadY()));
+
+        snake.setVelHeadX(velX);
+        snake.setVelHeadY(velY);
+
+        snake.addNextVelTailX(velX);
+        snake.addNextVelTailY(velY);
+        return true;
     }
 
     private void respondToKey(int key) {
-        switch (key) {
-            case KeyEvent.VK_RIGHT:
-                if (!isTurnSnakeAllowed()) break;
-                if (snake.getVelHeadX() == 0) {
-                    snake.turningPoints.add(0, new Point(snake.getHeadX(), snake.getHeadY()));
-
-                    double newVelX = Math.abs(snake.getVelHeadY());
-                    double newVelY = 0;
-
-                    snake.setVelHeadX(newVelX);
-                    snake.setVelHeadY(newVelY);
-
-                    snake.addNextVelTailX(newVelX);
-                    snake.addNextVelTailY(newVelY);
-                }
-                break;
-            case KeyEvent.VK_LEFT:
-                if (!isTurnSnakeAllowed()) break;
-                if (snake.getVelHeadX() == 0) {
-                    snake.turningPoints.add(0, new Point(snake.getHeadX(), snake.getHeadY()));
-
-                    double newVelX = - Math.abs(snake.getVelHeadY());
-                    double newVelY = 0;
-
-                    snake.setVelHeadX(newVelX);
-                    snake.setVelHeadY(newVelY);
-
-                    snake.addNextVelTailX(newVelX);
-                    snake.addNextVelTailY(newVelY);
-                }
-                break;
-            case KeyEvent.VK_DOWN:
-                if (!isTurnSnakeAllowed()) break;
-                if (snake.getVelHeadY() == 0) {
-                    snake.turningPoints.add(0, new Point(snake.getHeadX(), snake.getHeadY()));
-
-                    double newVelX = 0;
-                    double newVelY = Math.abs(snake.getVelHeadX());
-
-                    snake.setVelHeadX(newVelX);
-                    snake.setVelHeadY(newVelY);
-
-                    snake.addNextVelTailX(newVelX);
-                    snake.addNextVelTailY(newVelY);
-                }
-                break;
-            case KeyEvent.VK_UP:
-                if (!isTurnSnakeAllowed()) break;
-                if (snake.getVelHeadY() == 0) {
-                    snake.turningPoints.add(0, new Point(snake.getHeadX(), snake.getHeadY()));
-
-                    double newVelX = 0;
-                    double newVelY = - Math.abs(snake.getVelHeadX());
-
-                    snake.setVelHeadX(newVelX);
-                    snake.setVelHeadY(newVelY);
-
-                    snake.addNextVelTailX(newVelX);
-                    snake.addNextVelTailY(newVelY);
-                }
-                break;
-//            case 'b': // lengthen and accelerate
-//                if (!snake.isLengthening() && !snake.isAccelerating()) {
-//                    snake.setIdealSpeed(snake.getIdealSpeed() * 1.2);
-//                    snake.setAccelerating(true);
+        if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT || key == KeyEvent.VK_DOWN || key == KeyEvent.VK_UP)
+            turnSnake(key);
+//        if (key == KeyEvent.VK_B) { // this is for manual accelerate
+//            if (!snake.isLengthening() && !snake.isAccelerating()) {
+//                snake.setIdealSpeed(snake.getIdealSpeed() * 1.2);
+//                snake.setAccelerating(true);
 //
-//                    snake.setIdealTotalLength(snake.getIdealTotalLength() + LENGTHENING_FACTOR);
-//                    snake.setLengthening(true);
-//                }
-//                break;
-        }
+//                snake.setIdealTotalLength(snake.getIdealTotalLength() + LENGTHENING_FACTOR);
+//                snake.setLengthening(true);
+//            }
+//        }
     }
 
     private boolean isCollision() {

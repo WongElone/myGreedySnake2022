@@ -74,8 +74,8 @@ public class Snake {
             var origin = new Point(0, 0);
             var pointA = headToTailPoints.get(i);
             var pointB = headToTailPoints.get(i+1);
-            var upperLeftPoint = (Point.twoPointDistance(origin, pointA)
-                                < Point.twoPointDistance(origin, pointB)) ? pointA : pointB;
+            var upperLeftPoint = (Point.twoPointsDistance(origin, pointA)
+                                < Point.twoPointsDistance(origin, pointB)) ? pointA : pointB;
             double width = Math.abs(pointA.getX() - pointB.getX()) + thickness;
             double height = Math.abs(pointA.getY() - pointB.getY()) + thickness;
 
@@ -160,7 +160,7 @@ public class Snake {
         var buttIndex = turningPoints.size() - 1;
         Point butt = turningPoints.get(buttIndex);
 
-        var currentTailToButtDistance = Point.twoPointDistance(tail, butt);
+        var currentTailToButtDistance = Point.twoPointsDistance(tail, butt);
         if (currentTailToButtDistance > oldTailToButtDistance)  // that means the tail already pass the butt
         {
             // update butt
@@ -289,7 +289,7 @@ public class Snake {
 
         double totalLength = 0.0;
         for (short i = 0; i < headToTailPoints.size() - 1; i++) {
-            totalLength += Point.twoPointDistance(
+            totalLength += Point.twoPointsDistance(
                     headToTailPoints.get(i),
                     headToTailPoints.get(i + 1)
             );
@@ -303,7 +303,7 @@ public class Snake {
 
         double headToButtLength = 0.0;
         for (short i = 0; i < headToTailPoints.size() - 2; i++) {
-            headToButtLength += Point.twoPointDistance(
+            headToButtLength += Point.twoPointsDistance(
                     headToTailPoints.get(i),
                     headToTailPoints.get(i + 1)
             );
